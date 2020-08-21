@@ -1,0 +1,9 @@
+import pandas as pd
+
+data = pd.read_csv('MergedData.csv')
+
+results = data.query("Model == ['AIM', 'FARM'] & Scenario == ['SSP2_NoMt_NoCC_FlexA_WLD', 'SSP2_NoMt_NoCC_FlexA_USA', 'SSP2_NoMt_NoCC_FlexA_EUR', 'SSP2_NoMt_NoCC_FlexA_CHN', 'SSP2_NoMt_NoCC_FlexA_LAM', 'SSP2_NoMt_NoCC_FlexA_DEV', 'SSP2_NoMt_NoCC_HalfRD_DEV', 'SSP2_NoMt_NoCC_HalfRDoM_DEV'] & Region == ['CAN'] & Indicator == ['POPT'] & Sector == ['TOT']")
+
+results = results.sort_values(by=['Scenario','Model'])
+
+

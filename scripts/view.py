@@ -4,12 +4,17 @@
 import sys
 import ipywidgets as ui
 import urllib
+from scripts import plotter
 
 class View:
 
+	FILTER_PROG    = 'Searching...'
 	EMPTY_LIST_MSG = '''<br>(There's no data to display.)'''
-	ALL            = 'All'
+	ALL            = '(All)'
 	EMPTY          = ''
+	CREATING_LINK  = 'Creating link...'
+	NO_RECS_AVAIL  = '(No records available.)'
+	NOTE_TEXT_PRE  = 'The plot is based on results from the Selection tab.'
 
 	LO10 = ui.Layout(width='10%')
 	LO15 = ui.Layout(width='15%')
@@ -20,11 +25,13 @@ class View:
 		self.tabs	= None # Main UI container
 
 	def intro(self,model,ctrl):
+		'''Introduce MVC modules to each other'''
 		self.model = model
 		self.ctrl  = ctrl
 
 	def display(self,debug=False):
 		'''Build and show notebook user interface'''
+		self.plotter = plotter.Plotter(self.model)
 		self.build()
 
 		if debug:
@@ -72,8 +79,8 @@ class View:
 		USING_TITLE = 'Using This App'
 		USING_TEXT  = '''<p>
 		In the <b>Data</b> tab above, you can review the dataset.
-		In the <b>Filter</b> tab, you can search for and download data of interest.
-		Once you applied your filter(s), the data can be visualized in the <b>Plot</b> tab.
+		Go to the <b>Selection</b> tab to search for and download data of interest.
+		After selecting your data, create and download charts in the <b>Visualize</b> tab.
 		</p>'''
 		SOURCES_TITLE = 'Data Sources'
 		SOURCES_TEXT  = '''<p>
@@ -93,22 +100,25 @@ class View:
 	def data(self):
 		'''Create widgets for data tab content'''
 		SECTION_TITLE = 'Data'
+		DATA_INTRO    = "Here's an overview of the current full dataset:"
 
-		content = []
-
+		#content = []
+        #
+		##html = '<p>'+DATA_INTRO+'</p>'
+        #
 		## Set table format using CSS and start the HTML table
-		#html = '''<style>
+		#html += '''<style>
 		#				.data_cell {padding-right: 32px	 }
 		#				.data_even {background   : White	}
 		#				.data_odd  {background   : Gainsboro}
 		#			</style><table>'''
         #
-		## Table column headers
-		#for item in self.model.HEADERS:
-		#	html += '<th class="data_cell">' + item + '</th>'
+		### Table column headers
+		##for item in self.model.HEADERS:
+		##	html += '<th class="data_cell">' + item + '</th>'
         #
 		## Table items - alternate row background colors
-		#for i,line in enumerate(self.model.data):
+		#for i,line in enumerate(self.model.describe_data()):
         #
 		#	if i % 2 == 0:
 		#		html += '<tr class="data_even">'
@@ -121,54 +131,85 @@ class View:
 		#	html += '</tr>'
         #
 		#html += '</table>'
-		#
+        #
 		#widgets = []
 		#widgets.append(ui.HTML(value=html))
 		#content.append(self.section(SECTION_TITLE,widgets)) # TODO Constant
-		#
+        #
 		#return ui.VBox(content)
 
-		#self.desc_output = ui.Output(layout={'border': '1px solid black'})
-        #
-		#with self.desc_output:
-		#	for item in self.model.describe_data():
-		#		print(item)
-		#		print()
+		DATA_SECTION_TITLE = 'Data Overview'
 
 		self.desc_output = ui.Output(layout={'border': '1px solid black'})
 
 		with self.desc_output:
+			print(DATA_INTRO)
+			print()
 			print(self.model.describe_data())
+			print()
+			print()
 
-		return ui.VBox([self.desc_output])
+		return self.section(DATA_SECTION_TITLE,[ui.VBox([self.desc_output])])
 
 	def selection(self):
 		'''Create widgets for selection tab content'''
-		CRITERIA_TITLE = 'Selection Criteria'
-		CRITERIA_LABEL = 'Temperature (C)'
+		CRITERIA_TITLE = 'Selection'
 		CRITERIA_APPLY = 'Search'
 		OUTPUT_TITLE   = 'Results'
-		OUTPUT_PRE     = 'Limit to '
+		OUTPUT_PRE     = 'Limit display to '
 		OUTPUT_POST    = 'lines'
 		EXPORT_TITLE   = 'Export'
 		EXPORT_BUTTON  = 'Create Download Link'
 
-		# Create widgets
-		self.filter_txt_tempc   = ui.Text(description='',value='',placeholder='')
+		MOD            = 'Model'
+		SCN            = 'Scenario'
+		REG            = 'Region'
+		IND            = 'Indicator'
+		SEC            = 'Sector'
+		YEAR           = 'Year(s)'
+
+		# Create data selection widgets
+		self.filter_mod = ui.SelectMultiple(options=[self.ALL]+self.model.mods,value=[self.ALL],rows=5,description=MOD,disabled=False)
+		self.filter_scn = ui.SelectMultiple(options=[self.ALL]+self.model.scns,value=[self.ALL],rows=5,description=SCN,disabled=False)
+		self.filter_reg = ui.SelectMultiple(options=[self.ALL]+self.model.regs,value=[self.ALL],rows=5,description=REG,disabled=False)
+		self.filter_ind = ui.SelectMultiple(options=[self.ALL]+self.model.inds,value=[self.ALL],rows=5,description=IND,disabled=False)
+		self.filter_sec = ui.SelectMultiple(options=[self.ALL]+self.model.secs,value=[self.ALL],rows=5,description=SEC,disabled=False)
+
+		self.filter_yr1 = ui.Dropdown(options=[self.ALL]+self.model.years,value=self.ALL,description=YEAR,disabled=False,layout=self.LO15)
+		self.filter_yr2 = ui.Dropdown(options=[self.ALL]+self.model.years,value=self.ALL,description=''  ,disabled=False,layout=self.LO10)
+
+		# Create other widgets
 		self.filter_btn_apply   = ui.Button(description=CRITERIA_APPLY,icon='filter',layout=self.LO20)
 		self.filter_ddn_ndisp   = ui.Dropdown(options=['25','50','100',self.ALL],layout=self.LO10)
 		self.filter_html_output = ui.HTML(self.EMPTY_LIST_MSG)
 		self.filter_btn_refexp  = ui.Button(description=EXPORT_BUTTON,icon='download',layout=self.LO20)
 		self.filter_out_export  = ui.Output(layout={'border': '1px solid black'})
+		self.filter_nrec_output = ui.HTML('')
 
 		content = []
 
 		# Section: Selection criteria
 
 		widgets = []
-		widgets.append(ui.HTML(value=CRITERIA_LABEL))
-		widgets.append(self.filter_txt_tempc)
+
+		widgets.append(ui.HBox([
+			self.filter_mod
+			,self.filter_scn
+			,self.filter_reg
+		]))
+
+		widgets.append(ui.HBox([
+			self.filter_ind
+			,self.filter_sec
+		]))
+
+		widgets.append(ui.HBox([
+			self.filter_yr1
+			,self.filter_yr2
+		]))
+
 		widgets.append(self.filter_btn_apply)
+
 		content.append(self.section(CRITERIA_TITLE,widgets))
 
 		# Section: Output (with apply button)
@@ -176,7 +217,8 @@ class View:
 		widgets = []
 
 		row = []
-		row.append(ui.HTML('<div style="text-align: right;">'+OUTPUT_PRE+'</div>',layout=self.LO15))
+		row.append(self.filter_nrec_output)
+		row.append(ui.HTML('</span><div style="text-align: right;">'+OUTPUT_PRE+'</div>',layout=self.LO15))
 		row.append(self.filter_ddn_ndisp)
 		row.append(ui.HTML('<div style="text-align: left;">' +OUTPUT_POST+'</div>',layout=self.LO10))
 		widgets.append(ui.HBox(row))
@@ -196,15 +238,14 @@ class View:
 	def visualize(self):
 		'''Create widgets for visualizea tab content'''
 		NOTE_TITLE    = 'Note'
-		NOTE_TEXT     = 'The plot is based on results from the Selection tab.'
 		PLOT_TITLE    = 'Plot'
-		PLOT_OPTIONS  = ['No Smoothing','Lowess','Both']
 		PLOT_LABEL    = 'Select data fields'
 
 		content = []
-		content.append(self.section(NOTE_TITLE,NOTE_TEXT))
+		self.plot_note_html = ui.HTML(self.NOTE_TEXT_PRE)
+		content.append(self.section(NOTE_TITLE,[self.plot_note_html]))
 
-		self.plotex_ddn_selex_lg = ui.Dropdown(options=[self.EMPTY]+PLOT_OPTIONS,value=None,disabled=True)
+		self.viz_ddn_plot_type = ui.Dropdown(options=[self.EMPTY]+self.plotter.PLOT_OPTIONS,value=None,disabled=True)
 
 		widgets = []
 
@@ -213,116 +254,125 @@ class View:
 		row.append(ui.Label(value='',layout=ui.Layout(width='60%'))) # Cheat: spacer
 		widgets.append(ui.HBox(row))
 
-		widgets.append(self.plotex_ddn_selex_lg)
-		widgets.append(self.ctrl.plotter.line_plot) # Use widget from plotter
+		widgets.append(self.viz_ddn_plot_type)
+		widgets.append(self.plotter.fig) # Use widget from plotter
 		content.append(self.section(PLOT_TITLE,widgets))
 
 		return ui.VBox(content)
 
-	def update_filtered_gene_list(self):
-		'''Update filtered genes list with new data'''
+	def update_filtered_output(self):
+		'''Display new data in filtered output'''
+
+		self.filter_nrec_output.value = 'Total: <b>' + format(self.model.res_count,',') + '</b> records'
+
+		if self.model.res_count < 1:
+			self.filter_html_output.value = self.EMPTY_LIST_MSG
+			return
 
 		# Calc output line limit
 		if self.filter_ddn_ndisp.value == self.ALL:
-			limit = sys.maxsize
+			limit = self.model.res_count
 		else:
 			limit = int(self.filter_ddn_ndisp.value)
 
 		# CSS (style)
-
 		output = '''<style>
 					.op th {
-						padding	: 3px;
-						border	 : 1px solid black;
-						font-size  : 6px !important;
-						text-align : center;
-						line-height: 14px;
+						padding         : 3px;
+						border          : 1px solid black;
+						font-size       : 14px !important;
+						text-align      : center;
+						line-height     : 14px;
 						background-color: lightgray;
 					}
 					.op td {
-						padding	: 3px;
-						border	 : 1px solid black;
-						font-size  : 6px !important;
-						text-align : left;
-						line-height: 12px;
+						padding         : 3px;
+						border          : 1px solid black;
+						font-size       : 14px !important;
+						text-align      : left;
+						line-height     : 14px;
 					}
 					</style>'''
 
 		# Table start and header start
-		output += '<br><table class="op"><tr><th>'+self.FILTER17_TEXT+'</th>'
+		output += '<br><table class="op" style="border-spacing: 0px !important; border-collapse: collapse !important;"><tr>'
 
 		# Column headers
-		for anno in self.model.anno[1:]:  # Skip first header since its for gene ID
-			output += '<th class="op">'+anno+'</th>'
+		for hdr in self.model.headers:
+			output += '<th class="op">'+hdr+'</th>'
 
 		output += '</tr>'
 
 		# Build table rows
-		for count,(gene_id,annos) in enumerate(self.model.filter_results_annos.items()):
-			output += '<tr><td class="op">'+gene_id+'</td>'
 
-			for key,value in annos.items():
-				output += '<td class="op">'+value+'</td>'
-
+		for i,row in enumerate(self.model.iterate_results()):
+			output += '<tr>'
+			output += '<td class="op">'+str(row.Model    )+'</td>'
+			output += '<td class="op">'+str(row.Scenario )+'</td>'
+			output += '<td class="op">'+str(row.Region   )+'</td>'
+			output += '<td class="op">'+str(row.Indicator)+'</td>'
+			output += '<td class="op">'+str(row.Sector   )+'</td>'
+			output += '<td class="op">'+str(row.Unit     )+'</td>'
+			output += '<td class="op">'+str(row.Year     )+'</td>'
+			output += '<td class="op">'+str(row.Value    )+'</td>'
 			output += '</tr>'
 
-			if count+1 >= limit:
+			if i+1 == limit:
 				break
 
 		output += '</table>' # End table
 
 		self.filter_html_output.value = output  # Update UI
 
-	def set_plot_status(self,enable):
+	def set_plot_status(self):
 		'''Change status of plot-related widgets based on availability of filter results'''
+		self.ctrl.debug()
 
-		pltr = self.ctrl.plotter
-		pltr.clear_plots(self.plotex_img_dispp_hm)
-
-		if enable:
-			self.plotex_ddn_selex_lg.disabled = False
-			self.plotex_ddn_selex_hm.disabled = False
-			self.plotco_ddn_netw.disabled	  = False
-
-			pltr.line_plot.layout.title = pltr.LINE_PROMPT_TITLE
-			pltr.net_plot.layout.title  = pltr.NET_PROMPT_TITLE
-
-			pltr.out_plot_msg(self.plotex_img_dispp_hm,pltr.HEAT_PROMPT_TITLE)
-
+		if self.model.res_count > 0:
+			self.viz_ddn_plot_type.disabled = False
+			self.plotter.fig.layout.title   = self.plotter.PROMPT_TITLE
+			self.plot_note_html.value       = '<p>'+self.NOTE_TEXT_PRE+'</p>' + '<p>Query: '+self.model.query+'</p>'
 		else:
-			self.plotex_ddn_selex_lg.disabled = True
-			self.plotex_ddn_selex_hm.disabled = True
-			self.plotco_ddn_netw.disabled	 = True
+			self.viz_ddn_plot_type.disabled = True
+			self.plotter.fig.layout.title   = self.plotter.INIT_TITLE
+			self.plot_note_html.value       = '<p>'+self.NOTE_TEXT_PRE+'</p>' + '<p>'+self.NO_RECS_AVAIL+'</p>'
 
-			pltr.line_plot.layout.title = pltr.LINE_INIT_TITLE
-			pltr.net_plot.layout.title  = pltr.NET_INIT_TITLE
+	def draw_plot(self,choice):
+		'''Update plot'''
+		self.ctrl.debug()
 
-			pltr.out_plot_msg(self.plotex_img_dispp_hm,pltr.HEAT_INIT_TITLE)
-			self.ctrl.set_module_data([self.NO_MODULE_DATA],[(None,None)])
+		# Send plot chhoice and data to plotter
+		self.plotter.draw_plot(choice,self.model.results)
 
-	def get_module_export_header(self):
-		'''Generate module output header for export'''
-		ret = []
+	def export_msg(self,text):
+		'''Clear export output area then write text to it'''
+		self.ctrl.debug()
+		self.filter_out_export.clear_output()
 
-		for i in range(len(self.MODULE_HEADER[1])):
-			pre   = self.MODULE_HEADER[0][i].strip()
-			title = self.MODULE_HEADER[1][i].strip()
+		with self.filter_out_export:
+			display(ui.HTML('<p>'+text+'</p>'))
 
-			if not pre == '':
-				title = pre + ' ' + title
+	def export_link(self):
+		'''Create data URI link and add it to export output area'''
+		self.ctrl.debug()
+		self.filter_out_export.clear_output()
 
-			ret.append(title)
+		# Get human readable data size, see https://stackoverflow.com/questions/5194057/better-way-to-convert-file-sizes-in-python
 
-		return ret
+		size   = len(self.model.res_csv)
+		suffix = ['B','KB','MB','GB','TB']
+		index  = 0
 
-	def output_data_link(self,output_widget,data_str):
-		'''Create data URI link to download data'''
+		while size > 1024 and not suffix[index] == suffix[-1]:
+			index += 1
+			size   = size / 1024.0
 
-		pre  = '<a download="coexplorer.csv" target="_blank" href="data:text/csv;charset=utf-8,'
-		post = '">Download</a>'
+		size_str = '%.0f %s' % (size,suffix[index])
 
-		with output_widget:
-			display(ui.HTML(pre+urllib.parse.quote(data_str)+post))
+		# Output an encoded data URI for given string
 
+		pre  = '<a download="data.csv" target="_blank" href="data:text/csv;charset=utf-8,'
+		post = '">Download ('+size_str+')</a>'
 
-
+		with self.filter_out_export:
+			display(ui.HTML(pre+urllib.parse.quote(self.model.res_csv)+post))
