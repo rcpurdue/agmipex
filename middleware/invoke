@@ -1,0 +1,6 @@
+#!/bin/sh
+
+/usr/bin/invoke_app "$@" -t agmipex \
+                         -C "start_jupyter -A -T @tool agmipex.ipynb" \
+                         -u anaconda-6
+
