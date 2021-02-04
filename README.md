@@ -20,7 +20,7 @@ Model,Scenario,Region,Indicator,Sector,Unit,Year,Value
 ## Development
 
 ### Code Structure
-The AgMIP Explorer tool is a Jupyter notebook -based application. User interface widgets (menus, buttons, etc.) are created using [ipywidgets)[https://ipywidgets.readthedocs.io/en/stable/]. 
+The AgMIP Explorer tool is a Jupyter notebook -based application. User interface widgets (menus, buttons, etc.) are created using [ipywidgets](https://ipywidgets.readthedocs.io/en/stable/). 
 
 The tool runs the "agmipex.ipynb" notebooxk. However, instead of storing most of the code in notebook cells, the notebook references external Python code. So, the majority of logic resides in the Python files in the "scripts" subdirectory. The code follows the Model-View-Controller (MVC) pattern. That is, for simple organizational reasons, logic is split between the following:
 
@@ -32,7 +32,7 @@ The tool runs the "agmipex.ipynb" notebooxk. However, instead of storing most of
 
 ### Environment
 
-The tools is currently hosted on [MyGeoHub](https://www.mygeohub.org). MyGeoHub is a website based on [HUBzero]. AgMIP Explorer is therefore a HUBzero "tool". As such, supplementary files are required. This enforces most of the directory structure of this repository. Also, it requires the "invoke" file in the "middleware" subdirectory.
+The tools is currently hosted on [MyGeoHub](https://www.mygeohub.org). MyGeoHub is a website based on [HUBzero](https://hubzero.org/). AgMIP Explorer is therefore a HUBzero "tool". As such, supplementary files are required. This enforces most of the directory structure of this repository. Also, it requires the "invoke" file in the "middleware" subdirectory.
 
 ### Building, developing, and testing
 
