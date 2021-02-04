@@ -1,5 +1,5 @@
 # agmipex
-Data exploration for AgMIP
+AgMIP Explorer - Data exploration for [AgMIP](https://agmip.org/).
 
 ## Input Files
 
