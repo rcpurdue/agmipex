@@ -1,5 +1,5 @@
 # AgMIP Explorer
-AgMIP Explorer ("agmipex") is a data exploration tool for [AgMIP](https://agmip.org/).
+AgMIP Explorer ("agmipex") is a data exploration tool for [AgMIP](https://agmip.org/) based on the Self-Contained Science App (SCSA).
 
 ## Input Files
 
