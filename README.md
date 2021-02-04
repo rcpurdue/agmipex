@@ -1,9 +1,39 @@
-# agmipex
-AgMIP Explorer - Data exploration for [AgMIP](https://agmip.org/).
+# AgMIP Explorer
+AgMIP Explorer ("agmipex") is a data exploration tool for [AgMIP](https://agmip.org/).
 
 ## Input Files
 
- MergedData.csv
+The tool allows the user to select from mutliple data files. These are stored in the "data" subdirectory. Note that data files must conform to the following format restrictions:
+
+1. CSV files
+2. Initial header line
+3. Columns with spelling and order: Model,Scenario,Region,Indicator,Sector,Unit,Year,Value
+ 
+Example
+Model,Scenario,Region,Indicator,Sector,Unit,Year,Value
+"MOD","Scenario_1","REG","POPT","TOT","million",2001,1.23456
+...
+
+## Development
+
+### Code Structure
+The AgMIP Explorer tool is a Jupyter notebook -based application. User interface widgets (menus, buttons, etc.) are created using [ipywidgets)[https://ipywidgets.readthedocs.io/en/stable/]. 
+
+The tool runs the "agmipex.ipynb" notebooxk. However, instead of storing most of the code in notebook cells, the notebook references external Python code. So, the majority of logic resides in the Python files in the "scripts" subdirectory. The code follows the Model-View-Controller (MVC) pattern. That is, for simple organizational reasons, logic is split between the following:
+
+- model.py: Data access
+- view.py: User interface 
+- controller.py: General program logic, plotting, and coordination between model and view
+
+[Pandas](https://pandas.pydata.org/) is used for data access and [Matplotlib](https://matplotlib.org/) is used for plotting. 
+
+### Environment
+
+The tools is currently hosted on [MyGeoHub](https://www.mygeohub.org). MyGeoHub is a website based on [HUBzero]. AgMIP Explorer is therefore a HUBzero "tool". As such, supplementary files are required. This enforces most of the directory structure of this repository. Also, it requires the "invoke" file in the "middleware" subdirectory.
+
+### Building, developing, and testing
+
+Use of an Anaconda envirnment is highly recommended. After creating and environment (sss packages listed in 
 
 ## Running in a Docker Container
 
