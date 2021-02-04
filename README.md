@@ -11,11 +11,11 @@ The tool allows the user to select from mutliple data files. These are stored in
 4. Data in each column must be of type string, except for the "Year" (numeric integer) and "Value" (numeric float) columns. 
  
 Example:
-'''
+```
 Model,Scenario,Region,Indicator,Sector,Unit,Year,Value
 "MOD","Scenario_1","REG","INDIC","SEC","million",2001,1.23456
 ...
-'''
+```
 
 ## Development
 
