@@ -34,7 +34,7 @@ The tool runs the `agmipex.ipynb` notebooxk. However, instead of storing most of
 
 The tools is currently hosted on [MyGeoHub](https://www.mygeohub.org). MyGeoHub is a website based on [HUBzero](https://hubzero.org/). AgMIP Explorer is therefore a HUBzero "tool". As such, supplementary files are required. This enforces most of the directory structure of this repository. Also, it requires the `invoke` file in the `middleware` subdirectory.
 
-### Building, developing, and testing
+### Building, Developing, and Testing
 
-Use of an Anaconda envirnment is highly recommended. After creating and activating the conda environment (see `environment.yml` run `jupter notebook` to start the notebook server. Then, use the local URLs displayed by that command to access and run the notebook using your browser. Note that during development, you can change code in the .py files and simply refresh the notebook to test changes. 
+Use of an [Anaconda](https://www.anaconda.com/) envirnment is highly recommended. After creating and activating the conda environment (see `environment.yml`) run `jupter notebook` to start the notebook server. Then, use the local URLs displayed by that command to access and run the notebook using your browser. Note that during development, you can change code in the .py files and simply refresh the notebook to test changes. 
 
