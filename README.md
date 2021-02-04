@@ -3,7 +3,7 @@ AgMIP Explorer ("agmipex") is a data exploration tool for [AgMIP](https://agmip.
 
 ## Input Files
 
-The tool allows the user to select from mutliple data files. These are stored in the '''data''' subdirectory. Note that data files must meet the requirements:
+The tool allows the user to select from mutliple data files. These are stored in the `data` subdirectory. Note that data files must meet the requirements:
 
 1. File must be in CSV (comma separated values) format.
 2. File must contain an initial header line.
