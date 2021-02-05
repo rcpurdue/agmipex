@@ -14,6 +14,7 @@ Example:
 ```
 Model,Scenario,Region,Indicator,Sector,Unit,Year,Value
 "MOD","Scenario_1","REG","INDIC","SEC","million",2001,1.23456
+"MOD","Scenario_1","REG","INDIC","SEC","million",2002,7.89012
 ...
 ```
 
