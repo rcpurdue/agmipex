@@ -17,6 +17,7 @@ Model,Scenario,Region,Indicator,Sector,Unit,Year,Value
 "MOD","Scenario_1","REG","INDIC","SEC","million",2002,7.89012
 ...
 ```
+Note that input data files are not provided as part of this repository. Please contact the AgMIP project for more information.
 
 ## Development
 
