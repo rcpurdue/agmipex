@@ -33,7 +33,7 @@ The tool runs the `agmipex.ipynb` notebooxk. However, instead of storing most of
 
 ### Environment
 
-The tool is currently hosted on [MyGeoHub](https://www.mygeohub.org). MyGeoHub is a website based on [HUBzero](https://hubzero.org/). AgMIP Explorer is therefore a HUBzero "tool". As such, supplementary files are required. This enforces most of the directory structure of this repository. Also, it requires the `invoke` file in the `middleware` subdirectory.
+The tool is currently hosted on [MyGeoHub](https://www.mygeohub.org). MyGeoHub is a website based on [HUBzero](https://hubzero.org/). AgMIP Explorer is therefore a HUBzero "tool". As such, supplementary files are required. This enforces most of the directory structure of this repository. It requries the `src` directory and unused `Makefile`. Also, it requires the `invoke` file in the `middleware` subdirectory.
 
 ### Building, Developing, and Testing
 
